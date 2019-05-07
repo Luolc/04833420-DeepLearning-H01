@@ -14,7 +14,8 @@ from common import config
 
 
 class Model():
-    def __init__(self):
+    def __init__(self, lp=None):
+        self.lp = lp
         # set the initializer of conv_weight and conv_bias
         self.weight_init = tf_contrib.layers.variance_scaling_initializer(factor=1.0,
                                 mode='FAN_IN', uniform=False)
@@ -36,6 +37,10 @@ class Model():
 
     def _pool_layer(self, name, inp, ksize, stride, padding='SAME', mode='MAX'):
         assert mode in ['MAX', 'AVG'], 'the mode of pool must be MAX or AVG'
+        if self.lp:
+            x = tf.nn.avg_pool(tf.pow(inp, self.lp), ksize=[1, ksize, ksize, 1], strides=[1, stride, stride, 1],
+                               padding=padding, name=name, data_format='NHWC')
+            return tf.pow(x * ksize * ksize, 1 / self.lp)
         if mode == 'MAX':
             x = tf.nn.max_pool(inp, ksize=[1, ksize, ksize, 1], strides=[1, stride, stride, 1],
                                padding=padding, name=name, data_format='NHWC')
