@@ -34,6 +34,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--continue', dest='continue_path', required=False)
     parser.add_argument('-l', '--loss', default='softmax')
+    parser.add_argument('-lp', type=int)
     args = parser.parse_args()
 
     assert args.loss in ['softmax', 'abs-max', 'square-max', 'plus-one-abs-max', 'non-negative-max']
@@ -43,7 +44,7 @@ def main():
     test_batch_gnr, test_set = get_dataset_batch(ds_name='test')
 
     ## build graph
-    network = Model()
+    network = Model(args.lp)
     placeholders, label_onehot, logits = network.build()
 
     if args.loss == 'softmax':
